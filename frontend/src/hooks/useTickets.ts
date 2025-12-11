@@ -3,17 +3,9 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
-  UseQueryOptions,
 } from '@tanstack/react-query';
 import * as api from '../lib/api';
 import { toast } from 'sonner';
-
-// Types
-type TicketListParams = {
-  page?: number;
-  limit?: number;
-  status?: string;
-};
 
 // 1. FAQs
 export const useFaqs = (limit?: number) => {
@@ -38,7 +30,7 @@ export const useTickets = (
         limit,
         status: status === 'All' ? undefined : status,
       }),
-    placeholderData: (previousData) => previousData, // ← This replaces keepPreviousData in v5
+    placeholderData: (previousData) => previousData,
     staleTime: 1000 * 30, // 30 seconds
   });
 };
@@ -49,7 +41,7 @@ export const useTicket = (id: string | undefined) => {
     queryKey: ['ticket', id],
     queryFn: () => api.getTicketById(id!),
     enabled: !!id,
-    refetchInterval: 8000, // every 8 seconds
+    refetchInterval: 30000,
     staleTime: 1000 * 10,
   });
 };
@@ -59,7 +51,7 @@ export const useCreateTicket = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: api.createTicket,
+    mutationFn: (formData: FormData) => api.createTicket(formData),
     onSuccess: () => {
       toast.success('Ticket created successfully!');
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
@@ -76,12 +68,45 @@ export const useReplyTicket = (ticketId: string) => {
 
   return useMutation({
     mutationFn: (formData: FormData) => api.replyToTicket(ticketId, formData),
-    onSuccess: () => {
-      toast.success('Reply sent!');
+    onMutate: async (newReplyFormData) => {
+      await queryClient.cancelQueries({ queryKey: ['ticket', ticketId] });
+      const previousTicket = queryClient.getQueryData<api.Ticket>(['ticket', ticketId]);
+
+      if (previousTicket) {
+        const messageContent = newReplyFormData.get('message') as string;
+        const hasAttachment = !!newReplyFormData.get('attachment');
+
+        const optimisticMessage: api.Message = {
+          id: `optimistic-${Date.now()}`,
+          senderType: 'USER',
+          message: messageContent,
+          attachmentUrl: hasAttachment ? 'uploading...' : undefined,
+          createdAt: new Date().toISOString(),
+        };
+
+        queryClient.setQueryData<api.Ticket>(['ticket', ticketId], (old: api.Ticket | undefined) => {
+          if (!old) return old;
+          // Check if messages exists, if not init it
+          const oldMessages = old.messages || [];
+          return {
+            ...old,
+            messages: [...oldMessages, optimisticMessage],
+          };
+        });
+      }
+      return { previousTicket };
+    },
+    onError: (err: any, _newTodo, context: any) => {
+      if (context?.previousTicket) {
+        queryClient.setQueryData(['ticket', ticketId], context.previousTicket);
+      }
+      toast.error(err?.response?.data?.error || 'Failed to send reply');
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
     },
-    onError: () => {
-      toast.error('Failed to send reply');
+    onSuccess: () => {
+      toast.success('Reply sent!');
     },
   });
 };

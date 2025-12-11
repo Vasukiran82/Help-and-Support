@@ -1,55 +1,48 @@
 import { Ticket } from '../lib/api';
-import { StatusBadge } from './StatusBadge';
-import { CalendarDays, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { formatDate } from '../lib/utils';
+import { StatusBadge } from './StatusBadge';
+import { ChevronRight, FileText } from 'lucide-react';
 
-interface TicketCardProps {
-  ticket: Ticket;
-}
-
-export function TicketCard({ ticket }: TicketCardProps) {
-  const date = new Date(ticket.createdAt).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+export function TicketCard({ ticket }: { ticket: Ticket }) {
+  const date = formatDate(ticket.createdAt);
 
   return (
     <Link
       to={`/help-center/tickets/${ticket.id}`}
-      className="block w-full rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-blue-400 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-700"
+      className="group relative block w-full overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:border-gray-300 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
     >
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
-              #{ticket.ticketId}
-            </span>
-            <StatusBadge status={ticket.status} />
+      <div className="flex items-start justify-between p-5">
+        <div className="flex-1 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="inline-flex items-center justify-center rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold text-gray-900 transition-colors group-hover:text-blue-600 dark:text-gray-100 dark:group-hover:text-blue-400">
+                {ticket.subject}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                ID: #{ticket.id.slice(-8).toUpperCase()} &bull; Created on {date}
+              </p>
+            </div>
           </div>
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">
-            {ticket.subject}
-          </h3>
-        </div>
-        <div className={`mt-1 flex-shrink-0 rounded px-2 py-1 text-xs font-bold ${ticket.priority === 'HIGH' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-            ticket.priority === 'MEDIUM' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
-              'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
-          }`}>
-          {ticket.priority}
-        </div>
-      </div>
 
-      <div className="mt-4 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1">
-            <CalendarDays className="h-3.5 w-3.5" />
-            <span>{date}</span>
+          <div className="flex items-center gap-3 pl-[3.25rem]">
+            <StatusBadge status={ticket.status} />
+            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${ticket.priority === 'HIGH'
+              ? 'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-400/20'
+              : ticket.priority === 'MEDIUM'
+                ? 'bg-orange-50 text-orange-700 ring-orange-600/10 dark:bg-orange-900/20 dark:text-orange-400 dark:ring-orange-400/20'
+                : 'bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-400/20'
+              }`}>
+              {ticket.priority}
+            </span>
           </div>
-          {/* Note: We don't have message count in list API, so omitting or adding if we change API */}
         </div>
-        <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-          <span>View Details</span>
-          {/* Arrow or similar */}
+
+        <div className="flex-shrink-0 text-gray-400 transition-colors group-hover:text-blue-500 dark:text-gray-600">
+          <ChevronRight className="h-5 w-5" />
         </div>
       </div>
     </Link>

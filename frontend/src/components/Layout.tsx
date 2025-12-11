@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, HelpCircle, LogOut } from 'lucide-react';
+import { LayoutDashboard, HelpCircle } from 'lucide-react';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -24,8 +24,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 <Link
                                     to="/"
                                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/')
-                                            ? 'border-indigo-500 text-gray-900'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                        ? 'border-indigo-500 text-gray-900'
+                                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                                         }`}
                                 >
                                     <HelpCircle className="w-4 h-4 mr-2" />
@@ -34,8 +34,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 <Link
                                     to="/dashboard"
                                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/dashboard')
-                                            ? 'border-indigo-500 text-gray-900'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                        ? 'border-indigo-500 text-gray-900'
+                                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                                         }`}
                                 >
                                     <LayoutDashboard className="w-4 h-4 mr-2" />

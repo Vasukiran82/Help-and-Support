@@ -1,4 +1,3 @@
-import React from 'react';
 import { LucideIcon, ChevronRight } from 'lucide-react';
 
 interface ContactOptionProps {

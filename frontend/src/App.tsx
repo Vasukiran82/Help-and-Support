@@ -1,4 +1,4 @@
-import React from 'react';
+// src/App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HelpCenter from './pages/HelpCenter';
 import SupportDashboard from './pages/SupportDashboard';

@@ -7,19 +7,13 @@ import { ContactOption } from '../components/ContactOption';
 import { StatusBadge } from '../components/StatusBadge';
 
 export default function HelpCenter() {
-  const { data: faqs = [], isLoading: isLoadingFaqs } = useFaqs(5);
+  const { } = useFaqs(5);
   // Fetch recent tickets (limit 3)
   const { data: ticketsData, isLoading: isLoadingTickets } = useTickets(1, 3);
   const recentTickets = ticketsData?.tickets || [];
 
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
-
-  const filteredFaqs = faqs.filter(
-    (faq) =>
-      faq.title.toLowerCase().includes(search.toLowerCase()) ||
-      faq.content.toLowerCase().includes(search.toLowerCase())
-  );
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -52,15 +46,38 @@ export default function HelpCenter() {
           <div className="p-4 pb-0">
             <h2 className="text-base font-bold text-gray-900 mb-2">Frequently Asked Questions</h2>
           </div>
-          {isLoadingFaqs ? (
-            <div className="space-y-4 p-4">
-              {[1, 2].map(i => (
-                <div key={i} className="h-10 w-full animate-pulse rounded bg-gray-100"></div>
-              ))}
-            </div>
-          ) : (
-            <FAQAccordion faqs={filteredFaqs} />
-          )}
+          <FAQAccordion faqs={[
+            {
+              id: '1',
+              title: 'How do I track my order?',
+              content: 'You can track your order status in real-time by visiting the "My Orders" section of your account. Alternatively, click on the tracking link sent to your email after your order has been shipped.'
+            },
+            {
+              id: '2',
+              title: 'How do I return or replace an item?',
+              content: 'To initiate a return or replacement, go to "My Orders", select the item you wish to return, and click on "Return/Exchange". Follow the instructions to print your return label and schedule a pickup.'
+            },
+            {
+              id: '3',
+              title: 'When will I receive my refund?',
+              content: 'Refunds are typically processed within 5-7 business days after we receive your returned item. The amount will be credited back to your original payment method.'
+            },
+            {
+              id: '4',
+              title: 'My order arrived damaged — what should I do?',
+              content: 'We apologize for the inconvenience. Please contact our support team immediately with photos of the damaged item and packaging. We will arrange a replacement or full refund right away.'
+            },
+            {
+              id: '5',
+              title: 'My payment failed — what should I do?',
+              content: 'Please check that your card details and billing address are correct. If the issue persists, try a different payment method or contact your bank to ensure there are no restrictions on your card.'
+            },
+            {
+              id: '6',
+              title: 'How can I reset my password?',
+              content: 'Click on "Sign In" and select "Forgot Password". Enter your registered email address, and we will send you a secure link to reset your password.'
+            }
+          ]} />
         </div>
 
         {/* Get in Touch */}
@@ -107,7 +124,7 @@ export default function HelpCenter() {
                 ))}
               </div>
             ) : recentTickets && recentTickets.length > 0 ? (
-              recentTickets.map(ticket => (
+              recentTickets.map((ticket: any) => (
                 <Link
                   key={ticket.id}
                   to={`/help-center/tickets/${ticket.id}`}
