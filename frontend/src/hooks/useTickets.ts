@@ -16,10 +16,10 @@ type TicketListParams = {
 };
 
 // 1. FAQs
-export const useFaqs = () => {
+export const useFaqs = (limit?: number) => {
   return useQuery({
-    queryKey: ['faqs'],
-    queryFn: api.getFaqs,
+    queryKey: ['faqs', limit],
+    queryFn: () => api.getFaqs(limit),
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 };

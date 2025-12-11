@@ -90,7 +90,7 @@ export const SupportService = {
         take: limit,
         orderBy: { createdAt: "desc" },
         select: {
-          id: true,           // ← This is the real MongoDB _id
+          id: true,
           ticketId: true,
           subject: true,
           status: true,
@@ -161,9 +161,10 @@ export const SupportService = {
     });
   },
 
-  getFaqs: async () => {
+  getFaqs: async (limit?: number) => {
     return await prisma.faq.findMany({
       orderBy: { createdAt: "desc" },
+      take: limit,
     });
   },
 };

@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use("/api/support", supportRoutes);
+app.use("/api", supportRoutes);
 
 // Default route
 app.get("/", (_req, res) => {

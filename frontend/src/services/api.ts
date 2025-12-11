@@ -18,14 +18,14 @@ api.interceptors.request.use((config) => {
 });
 
 export interface FAQ {
-    id: number;
+    id: string;
     title: string;
     content: string;
     createdAt: string;
 }
 
 export interface Ticket {
-    id: number;
+    id: string;
     ticketId: string;
     subject: string;
     status: 'OPEN' | 'PENDING' | 'RESOLVED';
@@ -35,7 +35,7 @@ export interface Ticket {
 }
 
 export interface Message {
-    id: number;
+    id: string;
     senderType: 'USER' | 'ADMIN';
     message: string;
     attachmentUrl?: string | null;
@@ -51,12 +51,21 @@ export const getFaqs = async () => {
     return res.data.faqs;
 };
 
-export const getTickets = async (status: string = 'All') => {
-    const res = await api.get<{ tickets: Ticket[] }>(`/tickets?status=${status}&page=1&limit=50`);
-    return res.data.tickets;
+export const getTickets = async (params: { page?: number; limit?: number; status?: string } = {}) => {
+    const { page = 1, limit = 10, status = 'All' } = params;
+    const res = await api.get<{ tickets: Ticket[] }>(`/tickets`, {
+        params: { page, limit, status }
+    });
+    return res.data; // Note: Backend returns { tickets, pagination }. We might need to adjust or just return tickets.
+    // Based on useTickets, it seems to expect just tickets or the whole object.
+    // Let's check useTickets again. It accesses `data.tickets`.
+    // So if we return `res.data`, the hook gets `{ tickets, pagination }`.
+    // The hook in useTickets.ts: `const { data: ticketsData } = useTickets(...)`.
+    // Then `ticketsData?.tickets`.
+    // So `getTickets` should return the full response data structure.
 };
 
-export const getTicket = async (id: number) => {
+export const getTicket = async (id: string) => {
     const res = await api.get<TicketDetail>(`/tickets/${id}`);
     return res.data;
 };
@@ -74,7 +83,7 @@ export const createTicket = async (subject: string, description: string, file?: 
     return res.data;
 };
 
-export const replyTicket = async (id: number, message: string, file?: File) => {
+export const replyTicket = async (id: string, message: string, file?: File) => {
     const formData = new FormData();
     formData.append('message', message);
     if (file) {

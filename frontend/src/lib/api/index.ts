@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create axios instance
 const api = axios.create({
-  baseURL: '/api/support',
+  baseURL: '/api',
   withCredentials: true,
 });
 
@@ -46,8 +46,8 @@ export interface Message {
 }
 
 // API functions
-export const getFaqs = async (): Promise<FAQ[]> => {
-  const res = await api.get('/faqs');
+export const getFaqs = async (limit?: number): Promise<FAQ[]> => {
+  const res = await api.get('/faqs', { params: { limit } });
   return res.data.faqs || res.data;
 };
 
